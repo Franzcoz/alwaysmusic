@@ -6,7 +6,7 @@ const [prog, prog2, ...args] = process.argv
 // Conexión a base de datos
 
 const client = new Client({
- connectionString:
+    connectionString:
 'postgresql://postgres:postgres@localhost:/alwaysmusic'
 });
 
@@ -39,9 +39,9 @@ if (args.length === 0) {
         // Función asíncrona para agregar nuevo alumno
         async function agregar() {
         let res = await client.query(`insert into alumnos(nombre, rut, curso, nivel) values('${nom}', '${rut}', '${cur}', ${niv}) returning *`);
-        console.log(res);
+        console.log('Estudiante ingresado con éxito');
         client.end();
-        return
+        return;
         }
     agregar();
     } else {
@@ -50,11 +50,63 @@ if (args.length === 0) {
         return;
     }
 } else if (args[0] == 'consulta') {
-    asdasd
+    async function consultar() {
+        let res = await client.query('select * from alumnos');
+        let reg = res.rows;
+        console.log('Registro actual');
+        console.log(reg);
+        client.end();
+        return;
+        }
+    consultar();
 } else if (args[0] == 'editar') {
-    asdasd
+    if (args.length === 5) {
+        const nom = args[1];
+        const rut = args[2];
+        const cur = args[3];
+        const niv = args[4];
+        async function editar() {
+            let res = await client.query(`update alumnos set nombre = '${nom}', curso = '${cur}', nivel = ${niv} where rut = '${rut}' returning *`);
+            let reg = res.rows;
+            console.log(`Estudiante ${nom} editado con éxito`);
+            client.end();
+            return;
+            }
+        editar();
+    } else {
+        console.log('\n\n   Para editar un alumno, se requieren 4 argumentos: Nombre, Rut, Curso y Nivel\n\nRut es el único campo NO editable.');
+        client.end();
+        return;
+    }
 } else if (args[0] == 'rut') {
-    asdasd
+    if (args.length === 2) {
+        const rut = args[1];
+        async function consultar() {
+            let res = await client.query(`select * from alumnos where rut = '${rut}'`);
+            let reg = res.rows;
+            console.log(reg);
+            client.end();
+            return;
+            }
+        consultar();
+    } else {
+        console.log('\n\n   Para consultar por Rut, debe ingresar como único argumento el RUT del alumno deseado.');
+        client.end();
+        return;
+    }
 } else if (args[0] == 'eliminar') {
-    asdsdasd
+    if (args.length === 2) {
+        const rut = args[1];
+        async function eliminar() {
+            let res = await client.query(`delete from alumnos where rut = '${rut}'`);
+            console.log(`Estudiante ${nom} eliminado con éxito`);
+            client.end();
+            return;
+            }
+        eliminar();
+    } else {
+        console.log('\n\n   Para eliminar un registro, debe ingresar como único argumento el RUT del alumno a eliminar.');
+        client.end();
+        return;
+    }
 }
